@@ -16,9 +16,19 @@ ImmuCellAI_mouse<-function(sample,data_type,group_tag,customer,sig_file=NULL,exp
   data("l1_marker")
   data("l2_marker")
   data("l3_marker")
+  data("marker_exp")
   data("l1_cell_correction_matrix_new")
   data("l2_cell_correction_matrix_new")
   data("l3_cell_correction_matrix_new")
+  T_sub_ls<-c("CD4_T_cell","CD8_T_cell","NKT","Tgd")
+  B_sub_ls<-c("B1_cell","Follicular_B","Germinal_center_B","Marginal_Zone_B","Memory_B","Plasma_cell")
+  DC_sub_ls<-c("cDC1","cDC2","MoDC","pDC")
+  Gra_sub_ls<-c("Basophil","Eosinophil","mast_cell","Neutrophils")
+  Macro_sub_ls<-c("M1_macrophage","M2_macrophage")
+  CD4_T_sub_ls<-c("CD4_Tm","Naive_CD4_T","T_helper_cell","Treg")
+  CD8_T_sub_ls<-c("CD8_Tc","CD8_Tcm","CD8_Tem","CD8_Tex","Naive_CD8_T")
+  group_fre<-c()
+  marker_exp_raw<-marker_exp
   group_index=0
   if (group_tag){
     #group_index=as.numeric(as.vector(unlist(grep("group",row.names(sample)))))
@@ -64,16 +74,7 @@ ImmuCellAI_mouse<-function(sample,data_type,group_tag,customer,sig_file=NULL,exp
   gene_weight_mt<-gene_ref_weight_mt(paper_marker,marker_reccur)
   gene_weight_mt<-gene_weight_mt[genes,]
   immune_deviation_sample = apply(sam_exp,2,function(x) sample_ratio(x,marker_exp_partial[,names(paper_marker)],marker_tag_mat,data_type,gene_weight_mt,ref_pre,cell_cor_new_mat))
-  #row.names(immune_deviation_sample)<-row.names(marker_exp)
   infil_marker<-genes
-  # infil_exp<-data.frame(as.vector(unlist(immune_deviation_sample[genes,])))
-  # row.names(infil_exp)<-as.vector(unlist(sapply(colnames(immune_deviation_sample),function(x) paste(x,genes,sep="_"))))
-  # colnames(infil_exp)<-"Ratio"
-  # infil_marker<-list()
-  # for(sam in colnames(immune_deviation_sample)){
-  #   infil_marker[[sam]]<-row.names(infil_exp)[grep(sam,row.names(infil_exp))]
-  # }
-  # infil_exp$Ratio<-as.numeric(infil_exp$Ratio)
   infil_mt<-c()
   for(cell in names(l1_marker)[-c(5,6)]){
     genes_new<-intersect(l1_marker[[cell]],row.names(immune_deviation_sample))
@@ -89,18 +90,10 @@ ImmuCellAI_mouse<-function(sample,data_type,group_tag,customer,sig_file=NULL,exp
   }
   infil_mt[which(infil_mt<0)]=0
   infil_score<-apply(infil_mt,1,function(x) sum(x))
-  #infil_score[which(infil_score>2)]=runif(length(which(infil_score>2)),1,2)
-  #k=(0.9-0.1)/(max(infil_score)-min(infil_score))
-  #infil_score<-0.1+k*(infil_score-min(infil_score))
-
-
   tt = intersect(row.names(sample_exp),as.vector(unlist(paper_marker)))
   genes = intersect(tt,row.names(marker_exp))
   sam_exp<-sample_exp[genes,]
-  # layer1_result<-getResult(sam_exp,data_type,marker_exp_raw[,names(paper_marker)],paper_marker,ref_pre,cell_cor_new_mat)
-  # layer1_result<-round(t(apply(layer1_result,1,function(x) x/sum(x))),4)
   layer1_pre<-getResult(sam_exp,data_type,marker_exp_raw[,names(paper_marker)],paper_marker,ref_pre,cell_cor_new_mat,l1_cell_correction_matrix_new)
-  #infiltration_score<-apply(layer1_result,1,sum)
   layer1_result<-round(t(apply(layer1_pre,1,function(x) x/sum(x))),4)
 
   marker_exp<-marker_exp_raw
@@ -108,18 +101,11 @@ ImmuCellAI_mouse<-function(sample,data_type,group_tag,customer,sig_file=NULL,exp
   cell_cor_mat = matrix(rep(0,length(names(paper_marker))*length(names(paper_marker))),ncol=length(names(paper_marker)))
   row.names(cell_cor_mat) = names(paper_marker)
   colnames(cell_cor_mat) = names(paper_marker)
-  # binary tag matrix
-  #print(colnames(marker_exp_raw))
-  #print(names(paper_marker))
   ref_pre<-gsva(as.matrix(marker_exp_raw[,names(paper_marker)]),paper_marker,method="ssgsea",ssgsea.norm=TRUE)
   tt = intersect(row.names(sample_exp),as.vector(unlist(paper_marker)))
   genes = intersect(tt,row.names(marker_exp))
   sam_exp<-sample_exp[genes,]
-  # layer2_pre<-getResult(sam_exp,data_type,marker_exp_raw[,names(paper_marker)],paper_marker,ref_pre,cell_cor_new_mat)
-  # layer2_pre_trans<-data.frame(t(layer2_pre),check.names=F)
   layer2_pre<-getResult(sam_exp,data_type,marker_exp_raw[,names(paper_marker)],paper_marker,ref_pre,cell_cor_new_mat,l2_cell_correction_matrix_new)
-  # layer2_pre1<-t(getResult1(sample_exp,data_type,marker_exp_raw[,names(paper_marker)],paper_marker,ref_pre,cell_cor_new_mat,"l2"))
-
   layer2_pre_trans<-data.frame(t(layer2_pre),check.names=F)
 
 
@@ -138,39 +124,16 @@ ImmuCellAI_mouse<-function(sample,data_type,group_tag,customer,sig_file=NULL,exp
   tt<-t(layer_norm(layer2_pre_trans,Macro_sub_ls))
   tmp<-round(t(apply(tt,1,function(x) x/sum(x))),4)
   layer2_macro_norm<-tmp*layer1_result[,"Macrophage"]
-  #
-  # layer2_T_norm<-t(layer_norm(layer2_pre_trans,names(T_sub_ls)))*layer1_result[,"T_cell"]
-  # layer2_B_norm<-t(layer_norm(layer2_pre_trans,names(B_sub_ls)))*layer1_result[,"B_cell"]
-  # layer2_DC_norm<-t(layer_norm(layer2_pre_trans,names(DC_sub_ls)))*layer1_result[,"Dendritic_cells"]
-  # layer2_Gra_norm<-t(layer_norm(layer2_pre_trans,names(Gra_sub_ls)))*layer1_result[,"Granulocytes"]
-  # layer2_macro_norm<-t(layer_norm(layer2_pre_trans,names(Macro_sub_ls)))*layer1_result[,"Macrophage"]
-  #layer3
-  #Tcm T helper鐨刴arker闇€瑕佽皟鏁?
   layer2_cell_all<-cbind(layer2_T_norm,layer2_B_norm,layer2_DC_norm,layer2_Gra_norm,layer2_macro_norm)
-
   marker_exp<-marker_exp_raw
   paper_marker<-l3_marker
-
-
-
   ref_pre<-gsva(as.matrix(marker_exp_raw[,names(paper_marker)]),paper_marker,method="ssgsea",ssgsea.norm=TRUE)
   tt = intersect(row.names(sample_exp),as.vector(unlist(paper_marker)))
   genes = intersect(tt,row.names(marker_exp))
   sam_exp<-sample_exp[genes,]
-  # layer3_pre<-getResult(sam_exp,data_type,marker_exp_raw[,names(paper_marker)],paper_marker,ref_pre,cell_cor_new_mat)
-  # layer3_pre_trans<-data.frame(t(layer3_pre),check.names=F)
   layer3_pre<-getResult(sam_exp,data_type,marker_exp_raw[,names(paper_marker)],paper_marker,ref_pre,cell_cor_new_mat,l3_cell_correction_matrix_new)
   #
   layer3_pre_trans<-data.frame(t(layer3_pre),check.names=F)
-
-  # layer3_CD4_sub<-t(layer_norm(layer3_pre_trans,names(CD4_T_sub_ls)))
-  # # tmp<-round(t(apply(tt,1,function(x) x/sum(x))),4)
-  # # layer3_CD4_sub<-tmp*layer2_T_norm[,"CD4_T_cell"]
-  #
-  # layer3_CD8_sub<-t(layer_norm(layer3_pre_trans,names(CD8_T_sub_ls)))
-  # # tmp<-round(t(apply(tt,1,function(x) x/sum(x))),4)
-  # # layer3_CD8_sub<-tmp*layer2_T_norm[,"CD8_T_cell"]
-
   tt<-t(layer_norm(layer3_pre_trans,CD4_T_sub_ls))
   tmp<-round(t(apply(tt,1,function(x) x/sum(x))),4)
   layer3_CD4_sub<-tmp*layer2_T_norm[,"CD4_T_cell"]
@@ -217,16 +180,12 @@ ImmuCellAI_mouse<-function(sample,data_type,group_tag,customer,sig_file=NULL,exp
     exp_median=rbind(exp_median[,-1],p_va)
     #row.names(exp_median)=c(group_name,"p value")
     row.names(exp_median)=c(group_name,"p value")
-    group_fre<<-exp_median
-    write.table(group_fre,save_group,sep="\t",quote=F,col.names = NA)
-    Infiltration_score<-round(infil_score,3)
-    T_FRE<<-cbind(result_mat,Infiltration_score)
+    group_fre<-exp_median
     #print("done2")
-    plot_fun("boxplot",1,save_plot)
   }
   Infiltration_score<-round(infil_score,3)
-  T_FRE<<-cbind(result_mat,Infiltration_score)
-  write.table(T_FRE,save_abun,sep="\t",quote=F,col.names = NA)
+  T_FRE<-cbind(result_mat,Infiltration_score)
+  return(list(abundance=T_FRE,group_result=group_fre))
 }
 
 #' Title
@@ -266,32 +225,12 @@ getResult = function(sample,data_type,marker_exp,paper_marker,ref_pre,cell_cor_n
   row.names(marker_tag_mat) = row.names(marker_exp)
   colnames(marker_tag_mat) = names(paper_marker)
   marker_reccur<-marker_times_count(paper_marker)
-  # gene_weight_mt<-gene_ref_weight_mt(paper_marker,marker_reccur)
-  # gene_weight_mt<-gene_weight_all_ls[[num_layer]]
-  # genes<-intersect(genes,row.names(gene_weight_mt))
   gene_weight_mt<-c()
 
   exp_new = apply(sam_exp,2,function(x) sample_ratio(x,marker_exp[,names(paper_marker)],marker_tag_mat,data_type,gene_weight_mt,ref_pre,cell_cor_new_mat))
-  #print(head(exp_new))
-  #print(paper_marker)
   result = gsva(exp_new,paper_marker,method="ssgsea",ssgsea.norm=TRUE)
-  #exp_raio_new<-apply(sam_exp,2,function(x) sample_ratio_correction(x,marker_exp[,names(paper_marker)],marker_tag_mat,data_type,gene_weight_mt))
-  #print(head(result))
-  #
   result<-apply(result,1,function(x) round(x-min(x)+min(abs(x)),3))
-
-  # if(ncol(result)<3){
-  #   result[which(result<0)]=0
-  # }else{
-  #   result = result - apply(result,1,min)
-  #   #result[which(result<0)]=0
-  # }
   compensation_matrix_num = apply(compensation_matrix,2,as.numeric)
-  # progress$set(value = 20,detail = "Adjusting result by Compensation matrix")
-  # incProgress(0.2, detail = "Immune infiltration calculating")
-  # Sys.sleep(0.5)
-  # shinyWidgets::updateProgressBar(title = 'Immune infiltration calculating',id = "pb2",value=70,session=getDefaultReactiveDomain())
-  # if(customer==0){
   row.names(compensation_matrix_num) = row.names(compensation_matrix)
   result_mat = compensation(t(result),compensation_matrix_num)
   if(ncol(result_mat)>1){
@@ -360,7 +299,6 @@ layer_norm<-function(pre_result,cell_ls){
 #'
 #' @examples
 marker_times_count=function(paper_marker){
-  print(test)
   #all_genes=unique(as.vector(unlist(paper_marker)))
   gene_count=list()
   for(cell in names(paper_marker)){
@@ -494,29 +432,18 @@ marker_tag = function(comgenes,tag_gene){
 #'
 #' @examples
 sample_ratio = function(data,marker_exp,marker_tag_mat,data_type,gene_weight_mt,ref_pre,cell_cor_new_mat){
-  exp = 0
-  #print(data[1:2])
-  #Eprint(data_type)
-  if(data_type == "microarray"){
+    exp = 0
+    if(data_type == "microarray"){
     for (cell in colnames(marker_exp)){
-      # cor_cell<-intersect(names(which(cell_cor_new_mat[cell,]==1)),names(which(ref_pre[,cell]>0)))
-      # cor_cell_ratio<-ref_pre[cor_cell,cell]/sum(ref_pre[cor_cell,cell])
-      # names(cor_cell_ratio)<-cor_cell
-      # for(cc in cor_cell){
-      exp<-exp+data/(marker_exp[,cell])*marker_tag_mat[,cell]
+            exp<-exp+data/(marker_exp[,cell])*marker_tag_mat[,cell]
     }
     #}
   }else{
     for (cell in colnames(marker_exp)){
-      #exp = exp+log2(data+1)*gene_weight_mt[,cell]/marker_exp[,cell]*marker_tag_mat[,cell]
-      # cor_cell<-intersect(names(which(cell_cor_new_mat[cell,]==1)),names(which(ref_pre[,cell]>0)))
-      # cor_cell_ratio<-ref_pre[cor_cell,cell]/sum(ref_pre[cor_cell,cell])
-      # names(cor_cell_ratio)<-cor_cell
-      # for(cc in cor_cell){
-      exp<-exp+log2(data+1)/(marker_exp[,cell])*marker_tag_mat[,cell]
-      #}
+            exp<-exp+log2(data+1)/(marker_exp[,cell])*marker_tag_mat[,cell]
+      
     }
   }
-  #  print(exp[1:5])
+
   return(exp)
 }
