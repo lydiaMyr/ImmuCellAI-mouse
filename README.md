@@ -1,5 +1,5 @@
 # ImmuCellAI-mouse
-ImmuCellAI-mouse (Immune Cell Abundance Identifier for mouse, http://bioinfo.life.hust.edu.cn/ImmuCellAI-mouse/) is a tool to estimate the abundance of 36 immune cells based on gene expression profile from RNA-Seq or microarray data
+ImmuCellAI-mouse (Immune Cell Abundance Identifier for mouse, https://guolab.wchscu.cn/ImmuCellAI-mouse/) is a tool to estimate the abundance of 36 immune cells based on gene expression profile from RNA-Seq or microarray data
 ## Installation
 ``` bash
 install.packages("devtools")
