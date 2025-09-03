@@ -11,11 +11,6 @@ cell_type_correlation(marker_exp, marker_ls)
 \arguments{
 \item{marker_ls}{}
 }
-\value{
-
-
-
-}
 \description{
 Title
 

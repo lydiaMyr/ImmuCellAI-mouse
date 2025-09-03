@@ -11,11 +11,6 @@ layer_norm(pre_result, cell_ls)
 \arguments{
 \item{cell_ls}{}
 }
-\value{
-
-
-
-}
 \description{
 Title
 

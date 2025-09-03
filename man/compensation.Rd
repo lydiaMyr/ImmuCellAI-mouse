@@ -11,11 +11,6 @@ compensation(raw_score, compensation_matrix)
 \arguments{
 \item{compensation_matrix}{}
 }
-\value{
-
-
-
-}
 \description{
 Title
 

@@ -27,11 +27,6 @@ getResult(
 \arguments{
 \item{compensation_matrix}{}
 }
-\value{
-
-
-
-}
 \description{
 Title
 

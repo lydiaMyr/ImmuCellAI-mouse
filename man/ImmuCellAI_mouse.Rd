@@ -2,12 +2,12 @@
 % Please edit documentation in R/ImmuCellAI_mouse.R, R/hello.R
 \name{ImmuCellAI_mouse}
 \alias{ImmuCellAI_mouse}
-\title{Title}
+\title{ImmuCellAI_mouse (Immune Cell Abundance Identifier for mouse)}
 \usage{
 ImmuCellAI_mouse(
   sample,
-  data_type,
-  group_tag,
+  data_type = "rnaseq",
+  group_tag = 0,
   customer,
   sig_file = NULL,
   exp_file = NULL
@@ -15,23 +15,49 @@ ImmuCellAI_mouse(
 
 ImmuCellAI_mouse(
   sample,
-  data_type,
-  group_tag,
+  data_type = "rnaseq",
+  group_tag = 0,
   customer,
   sig_file = NULL,
   exp_file = NULL
 )
 }
 \arguments{
+\item{sample}{Data frame of sample expression profile in FPKM, TPM format by RNA-seq or log2-transformed signal by microarray. The row names should be gene IDs and column name should be Sample names. It can also contain Group information as an extra row just below the column names when using \code{group_tag=1}.}
+
+\item{data_type}{Use either "rnaseq" and "microarray". Default: "rnaseq"}
+
+\item{group_tag}{If there is the need to perform the comparision between different groups. Possible value: 0 or 1. If the value is 1, users need to add a group tag row in the input expression matrix to explain the group of each sample. Default: 0}
+
+\item{customer}{If there is the need to upload the self-build reference file. Possible value: 0 or 1. If the value = 1, users need to provide the gene signature (by list format in R) and reference expression matrix with row names is gene, colnames is cell type and separated by tab.}
+
 \item{exp_file}{}
 }
 \value{
+The output of the function is a list with three variables including sample immune cell abundance, group comparison result and ICB response prediction result.
 
-
-
+The output of the function is a list with three variables including sample immune cell abundance, group comparison result and ICB response prediction result.
 }
 \description{
-Title
+Estimate the abundance of 36 immune cells based on gene expression profile from RNA-Seq or microarray data.
 
-Title
+Estimate the abundance of 36 immune cells based on gene expression profile from RNA-Seq or microarray data.
+}
+\examples{
+\dontrun{
+df <- read.csv("ImmuCellAI_mouse_example.txt", header = T, sep = "\t", row.names = 1)
+results <- ImmuCellAI_mouse(
+  sample = df,
+  data_type = "rnaseq", group_tag = 0
+)
+}
+
+\dontrun{
+df <- read.csv("ImmuCellAI_mouse_example.txt", header = T, sep = "\t", row.names = 1)
+results <- ImmuCellAI_mouse(
+  sample = df,
+  data_type = "rnaseq", group_tag = 0
+)
+}
+
 }

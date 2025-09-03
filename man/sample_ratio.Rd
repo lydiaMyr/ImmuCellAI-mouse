@@ -27,11 +27,6 @@ sample_ratio(
 \arguments{
 \item{cell_cor_new_mat}{}
 }
-\value{
-
-
-
-}
 \description{
 Title
 

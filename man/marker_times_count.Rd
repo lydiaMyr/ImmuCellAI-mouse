@@ -11,11 +11,6 @@ marker_times_count(paper_marker)
 \arguments{
 \item{paper_marker}{}
 }
-\value{
-
-
-
-}
 \description{
 Title
 

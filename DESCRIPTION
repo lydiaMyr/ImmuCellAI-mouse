@@ -1,12 +1,14 @@
 Package: ImmuCellAImouse
-Version: 0.1.0
+Version: 0.1.1
 Date: 20220618
 Author: Ya-Ru Miao
 Title: ImmuCellAI-mouse: a tool for comprehensive prediction of mouse immune cell abundance and immune microenvironment depiction
 Maintainer: Ya-Ru Miao<1076754963@qq.com>
-Depends: GSVA, dplyr
+Depends: R (>= 3.6), GSVA, dplyr, pracma, magrittr, utils, quadprog
 Suggests: MASS
 Description: ImmuCellAI-mouse is a tool to estimate the abundance of 36 immune cells based on gene expression profile from RNA-Seq or microarray data.
 License: GPL
 URL: http://bioinfo.life.hust.edu.cn/ImmuCellAI-mouse/
-RoxygenNote: 7.0.2
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

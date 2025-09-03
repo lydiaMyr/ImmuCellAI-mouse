@@ -11,11 +11,6 @@ gene_ref_weight_mt(marker_ls, marker_reccur)
 \arguments{
 \item{marker_reccur}{}
 }
-\value{
-
-
-
-}
 \description{
 Title
 

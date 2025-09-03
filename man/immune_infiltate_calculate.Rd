@@ -11,11 +11,6 @@ immune_infiltate_calculate(exp, gene_name, data_type, pre_result)
 \arguments{
 \item{pre_result}{}
 }
-\value{
-
-
-
-}
 \description{
 Title
 

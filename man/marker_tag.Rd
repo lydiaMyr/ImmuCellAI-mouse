@@ -11,11 +11,6 @@ marker_tag(comgenes, tag_gene)
 \arguments{
 \item{tag_gene}{}
 }
-\value{
-
-
-
-}
 \description{
 Title
 
